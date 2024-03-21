@@ -14,25 +14,22 @@
  *  You should have received a copy of the GNU General Public License
  *   along with emlak-api.  If not, see <https://www.gnu.org/licenses/>.
  */
-const express = require('express');
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const app = express();
+
 const mongoose = require('mongoose');
+const User = require('./User');
 
-mongoose.connect('mongodb:///emlak_db', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
 
-require("dotenv/config");
-const cookieParser = require('cookie-parser');
+const PhotoSchema = new mongoose.Schema({
+    path: { type: String, required: true },
+    type: {
+        type: String,
+        enum: ['advert', 'profile', 'product', 'other'],
+        default: 'other',
+    },
+    user: { type: mongoose.Types.ObjectId, ref: 'User' },
+    created: { type: Date, default: Date.now() },
+}, { collection: 'Photo', usePushEach: true });
 
-app.use(bodyParser.json());
-app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
 
-app.use(cors());
-
-module.exports = app;
+/** @class Photo */
+module.exports = mongoose.model("Photo", PhotoSchema);
