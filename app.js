@@ -20,10 +20,9 @@ const cors = require("cors");
 const app = express();
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb:///emlak_db', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+
+
+mongoose.connect(`mongodb+srv://${process.env.USER_NAME}:${process.env.PASSWORD}@cluster0.xwgcemn.mongodb.net/${process.env.DATABASE_NAME}?retryWrites=true&w=majority`);
 
 require("dotenv/config");
 const cookieParser = require('cookie-parser');
