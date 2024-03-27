@@ -15,23 +15,32 @@
  *   along with emlak-api.  If not, see <https://www.gnu.org/licenses/>.
  */
 const express = require('express');
-const bodyParser = require("body-parser");
-const cors = require("cors");
 const app = express();
-const mongoose = require('mongoose');
 
-
-
-mongoose.connect(`mongodb+srv://${process.env.USER_NAME}:${process.env.PASSWORD}@cluster0.xwgcemn.mongodb.net/${process.env.DATABASE_NAME}?retryWrites=true&w=majority`);
-
-require("dotenv/config");
-const cookieParser = require('cookie-parser');
-
+const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
+const cors = require("cors");
 app.use(cors());
+
+require("dotenv/config");
+
+const { connectToDB } = require('./api/helpers/utils');
+app.use(connectToDB);
+
+const { authenticateToken } = require('./middlewares/authmiddleware');
+app.use(authenticateToken);
+
+const advertRoutes = require('./api/routes/advert');
+const userRoutes = require('./api/routes/user');
+const authRoutes = require('./api/routes/auth');
+app.use('/', authRoutes);
+app.use('/adverts', advertRoutes);
+app.use('/users', userRoutes);
 
 module.exports = app;
