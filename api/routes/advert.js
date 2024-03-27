@@ -48,7 +48,7 @@ router.post('/advert', async (req, res) => {
 router.get('/:advertId', async (req, res) => {
     try {
         const id = req.params.advertId;
-        const advert = await Advert.findById(id);
+        const advert = await Advert.getPopulatedAdvertById(id);
         res.json(advert);
     } catch (e) {
         res.json(e);

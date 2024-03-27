@@ -76,6 +76,26 @@ AdvertSchema.statics = {
         return this.deleteOne({ _id: id });
     },
 
+    async getPopulatedAdvertById(id) {
+        return this.findOne({ _id: id })
+            .populate([
+                {
+                    path: 'author',
+                },
+                {
+                    path: 'status_changer',
+                    populate: [
+                        {
+                            path: 'author',
+                        }
+                    ],
+                },
+                {
+                    path: 'images',
+                },
+            ])
+    },
+
     /** @memberOf Advert */
     async findAdvertsByUid(uid) {
         return this.find({ author: uid })
