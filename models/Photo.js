@@ -30,6 +30,16 @@ const PhotoSchema = new mongoose.Schema({
     created: { type: Date, default: Date.now() },
 }, { collection: 'Photo', usePushEach: true });
 
+PhotoSchema.statics = {
+    /** @memberOf Photo */
+    async getPopulatedPhotoById(id) {
+        const photo = await this.findOne({ _id: id });
+        if (photo) {
+            delete photo.user;
+            return photo;
+        }
+    }
+};
 
 /** @class Photo */
 module.exports = mongoose.model("Photo", PhotoSchema);

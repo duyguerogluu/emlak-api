@@ -17,7 +17,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Advert = require('../../models/Advert');
+const Photo = require('../../models/Photo');
 const router = express.Router();
+const fs = require('fs');
+const { makeID } = require('../helpers/utils');
+
+const dir = './upload/advert';
 
 router.get('/', async (req, res) => {
     try{
@@ -50,6 +55,108 @@ router.get('/:advertId', async (req, res) => {
         res.json(advert);
     } catch (e) {
         res.json(e);
+    }
+});
+
+router.get('/images', async (req, res) => {
+    const input = req.body.images;
+
+    // Girdi eger yoksa ya da liste degilse 403 dondur
+    if (!input || !Array.isArray(input)) {
+        return res.status(403).json({ 'error': 'Forbidden' })
+    }
+
+    try {
+        // Yukleme klasoru yoksa hata dondur
+        if (!fs.existsSync(dir)) {
+            return res.status(404).json({ 'error': 'Not found' });
+        }
+
+        var images = {}
+        for (let i = 0; i < input.length; i++) {
+            const photoId = input[i];
+            const photoObj = await Photo.getPopulatedPhotoById(photoId);
+            if (!photoObj) {
+                continue;
+            }
+
+            const filename = `${dir}/${photoObj.path}`;
+            if (!fs.existsSync(filename)) {
+                continue;
+            }
+
+            const data = fs.readFileSync(filename);
+            images[id] = data.toString('base64');
+        }
+
+        if (images.length < 1) {
+            return res.status(404).json({ 'error': 'Not found' });
+        }
+
+        return res.status(200).json(images);
+    } catch (e) {
+        console.log(e)
+        return res.status(500).json({ 'error': e.toString() })
+    }
+});
+
+router.put('/images', async (req, res) => {
+    const input = req.body.images;
+
+    // Girdi eger yoksa ya da liste degilse 403 dondur
+    if (!input || !Array.isArray(input) || !req.user) {
+        return res.status(403).json({ 'error': 'Forbidden' })
+    }
+
+    try {
+        // Klasor yoksa olustur
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+
+        // Dosyanin olup olmama durumuna gore dosya adi belirle (dosya uzunlugu 64 karakter)
+        function safeMakeID() {
+            let filename = null
+
+            do {
+                const id = makeID(64)
+                filename = `${dir}/${id}`
+            } while (!fs.existsSync(filename))
+
+            return filename;
+        }
+
+        // Gelen dosyalari kaydet
+        var images = []
+        for (let i = 0; i < input.length; i++) {
+            // Dosya konumunu getir
+            const filename = safeMakeID()
+
+            // Base64 -> veri cevrimi
+            const item = input[i].bytes
+            const buff = Buffer.from(item, 'base64')
+            const text = buff.toString('binary')
+
+            // Dosyaya kaydet
+            fs.writeFileSync(filename, text)
+
+            // Resmin dosya yolunu parcalara ayir ve dosya adini listeye kaydet
+            const routeWays = filename.split('/')
+            const lastSplit = routeWays[routeWays.length - 1]
+
+            const photoObj = new Photo({
+                type: 'advert',
+                path: lastSplit,
+                user: req.user,
+            });
+            const savedPhotoObj = await photoObj.save();
+            images.push(savedPhotoObj._id);
+        }
+
+        return res.status(200).json({ images })
+    } catch (e) {
+        console.log(e)
+        return res.status(500).json({ 'error': e.toString() })
     }
 });
 
