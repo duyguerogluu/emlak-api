@@ -19,7 +19,7 @@ const jwt = require('jsonwebtoken');
 const Token = require('../models/Token');
 
 const authenticateToken = async (req, res, next) => {
-    if (process.env.ENABLE_AUTH === 0) {
+    if (process.env.ENABLE_AUTH == 0) {
         return next();
     }
 

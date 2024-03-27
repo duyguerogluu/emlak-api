@@ -14,12 +14,10 @@
  *  You should have received a copy of the GNU General Public License
  *   along with emlak-api.  If not, see <https://www.gnu.org/licenses/>.
  */
-const http = require('http');
-
 const app = require('./app');
 
 const port = process.env.PORT || 3000;
 
-const server = http.createServer(app);
-
-server.listen(port)
+app.listen(port, () => {
+    console.log('Express server listening on port ' + port);
+});
