@@ -53,7 +53,6 @@ const AdvertSchema = new mongoose.Schema({
         reason: { type: String, default: null },
         changed: { type: Date, required: true },
     },
-    advert_id: { type: Number, required: true },
     advert_type: { type: String, required: true },
     m2_gross: { type: Number, required: true },
     m2_net: { type: Number, required: true },
@@ -76,6 +75,7 @@ AdvertSchema.statics = {
         return this.deleteOne({ _id: id });
     },
 
+    /** @memberOf Advert */
     async getPopulatedAdvertById(id) {
         return this.findOne({ _id: id })
             .populate([

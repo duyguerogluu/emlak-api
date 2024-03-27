@@ -30,32 +30,31 @@ router.get('/advert', async (req, res) => {
 
 
 router.post('/advert', async (req, res) => {
-    //console.log(req.body, "body");
-    const advert = new Advert({
-        title: req.body.title,
-        description: req.body.description,
-        author: req.body.author,
-        images: req.body.images,
-        price: req.body.price,
-        advert_type: req.body.advert_type,
-        rooms: req.body.rooms,
-    });
+    const model = req.body;
+
+    // delete unwanted variables from model
+    delete model._id;
+    delete model.status;
+    delete model.status_changer;
+    delete model.created;
+    delete model.modified;
+
+    const advert = new Advert(model);
     await advert.save();
     res.json(advert);
 });
 
 router.get('/:advertId', async (req, res) => {
     try {
-        const id = req.params.advertId;
-        const advert = await Advert.getPopulatedAdvertById(id);
+        const advert = await Advert.getPopulatedAdvertById(req.params.advertId);
         res.json(advert);
     } catch (e) {
         res.json(e);
     }
 });
 
+/*
 router.put('/:advertId', async (req, res) => {
-
     try{
         const updateAdvert = await Advert.findByIdAndUpdate(req.params.advertId, {
             title: req.body.title,
@@ -71,6 +70,7 @@ router.put('/:advertId', async (req, res) => {
         res.json(e);
     }
 });
+*/
 
 router.delete('/:advertId', async (req, res) => {
     try{
