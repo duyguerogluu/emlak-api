@@ -19,7 +19,7 @@ const mongoose = require('mongoose');
 const Advert = require('../../models/Advert');
 const router = express.Router();
 
-router.get('/advert', async (req, res) => {
+router.get('/', async (req, res) => {
     try{
         const advertList = await Advert.find().limit(30);
         res.json(advertList);
@@ -29,7 +29,7 @@ router.get('/advert', async (req, res) => {
 })
 
 
-router.post('/advert', async (req, res) => {
+router.post('/', async (req, res) => {
     const model = req.body;
 
     // delete unwanted variables from model
