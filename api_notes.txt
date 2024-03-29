@@ -1,0 +1,131 @@
+--------- Models ---------
+
+Photo model:
+{
+    "path": "File path",
+    "type": "Photo type enum (advert, profile, other)",
+    "user": "The user who uploaded this photo - optional!",
+    "created": "Photo creation date"
+}
+
+User model:
+{
+    "username": "username eg. admin45",
+    "first_name": "User's first name",
+    "last_name": "User's last name",
+    "password": "bcrypted password",
+    "created": "Creation date",
+    "updated": "Update date (must be changed by API)",
+    "adverts": List of Advert models,
+    "phone": "The phone number of the user",
+    "email": "The email address of the user",
+    "location": List of location models
+}
+
+Location model:
+{
+    "region": "The region of the user - eg. Buyukcekmece",
+    "city": "The city of the user - eg. Istanbul",
+    "country": "The country of the user - eg. TR - defaults to TR",
+    "geo": {
+        "lat": "latitude of the location",
+        "lon": "longtitude of the location",
+    }
+}
+
+Advert model:
+{
+    "title": "Advert title",
+    "description": "Advert description",
+    "author": User model,
+    "images": [ Photo model, Photo model, ... ],
+    "location": Location model,
+    "price": {
+        "amount": 23,
+        "currency": "The currency of the money - eg. TRY - defaults to TRY"
+    },
+    "created": "Creation date",
+    "modified": "Update date (must be changed by API)",
+    "status": The advert status enum (0 - IN REVIEW, 1 - ACCEPTED, 2 - REJECTED) - defaults to 0,
+    "status_changer": Status changer model - optional!,
+    "advert_type": "Advert type - eg. Home",
+    "m2_gross": The gross value of m2 - eg. 120,
+    "m2_net": The net value of m2 - eg. 118,
+    "rooms": Rooms model,
+    "apartment_floor": The floor if it's an apartment - eg. 3,
+    "apartment_total_floor": The total floor if it's an apartment - eg. 5,
+    "heating_type": "Heating type - eg. Gas",
+    "in_site": true if it's in a site/except false,
+    "site_name": "The site name if in_site is true"
+}
+
+Status changer model:
+{
+    "author": User model,
+    "reason": "Why this status changed?",
+    "changed": "The status change time",
+}
+
+Rooms model:
+{
+    "living_room": The living room count,
+    "bath": The bath room count,
+    "toilet": The toilet room count,
+    "other": The other room count
+}
+
+--------- Endpoints ---------
+
+Endpoint: /login
+Method: POST
+Authentication: No
+Body: { "username": "kullaniciadi", "password": "bcryptliparola" }
+Returns: { "succeded": true, "message": "Logged in successfully!", "token": "Authentication token", "validTime": 139438543594 }
+
+Endpoint: /signup
+Method: POST
+Authentication: No
+Body: { "username": "kullaniciadi", "password": "duzparola", "first_name": "Adi", "last_name": "Soyadi", "phone": "+90xxxyyyzztt", "email": "mail@example.com" }
+Returns: { "succeded": true, "message": "User created successfully", "user": User model }
+
+Endpoint: /adverts
+Method: GET
+Authentication: Yes
+Body: Empty
+
+Endpoint: /adverts
+Method: POST
+Authentication: Yes
+Body: Advert model
+Returns: Advert model
+
+Endpoint: /adverts/:advertId
+Method: GET
+Authentication: Yes
+Body: Empty
+Returns: Advert model
+
+Endpoint: /adverts/images
+Method: GET
+Authentication: Yes
+Body: { "images": [ "Photo model id", "Photo model id", ... ] }
+Returns: [ Photo model, Photo model, ... ]
+
+
+Endpoint: /adverts/images
+Method: POST
+Authentication: Yes
+Body: { "images": [ "photo file (base64)", "photo file (base64)", ... ] }
+Returns: { "images": [ "Photo model id", "Photo model id", ... ] }
+
+Endpoint: /adverts/:advertId
+Method: DELETE
+Authentication: Yes
+Body: Empty
+Returns: Advert model
+
+Endpoint: /users
+Method: GET
+Authentication: Yes
+Body: Empty
+Returns: [ User model, User model, ... ]

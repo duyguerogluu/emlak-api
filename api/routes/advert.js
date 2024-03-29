@@ -58,7 +58,7 @@ router.get('/:advertId', async (req, res) => {
     }
 });
 
-router.get('/images', async (req, res) => {
+router.post('/images', async (req, res) => {
     const input = req.body.images;
 
     // Girdi eger yoksa ya da liste degilse 403 dondur
